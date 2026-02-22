@@ -1,28 +1,5 @@
-// const setupLocationSocket = (io) => {
-//   io.on("connection", (socket) => {
-//     console.log("User connected:", socket.id);
-
-//     socket.on("send_location", (data) => {
-//       console.log("Location received:", data);
-
-//       socket.broadcast.emit("receive_location", {
-//         id: socket.id,
-//         latitude: data.latitude,
-//         longitude: data.longitude,
-//       });
-//     });
-
-//     socket.on("disconnect", () => {
-//       console.log("User disconnected:", socket.id);
-//       socket.broadcast.emit("user_disconnected", socket.id);
-//     });
-//   });
-// };
-
-// module.exports = setupLocationSocket;
-
 const UserLocation = require("../models/UserLocationModels");
-const User = require("../models/UserSignUpmodel"); // your user model
+const User = require("../models/UserSignUpmodel");
 const mongoose = require("mongoose");
 
 const setupLocationSocket = (io) => {
@@ -38,7 +15,6 @@ const setupLocationSocket = (io) => {
 
     console.log("User connected:", userId);
 
-    // ✅ Join personal room (optional but useful)
     socket.join(userId);
 
     socket.on("join_group", (groupId) => {
@@ -49,15 +25,13 @@ const setupLocationSocket = (io) => {
       try {
 
         const { latitude, longitude, groupId } = data;
-   
-        // ✅ 1. Save location in DB
+
         const location = await UserLocation.findOneAndUpdate(
           { user: userId },
           { latitude, longitude },
-          { returnDocument: 'after', upsert: true } // ✅ 2026 Recommended way
+          { returnDocument: "after", upsert: true }
         );
 
-        // ✅ 2. Get user details
         const user = await User.findById(userId).select("firstName");
 
         const payload = {
@@ -68,8 +42,8 @@ const setupLocationSocket = (io) => {
           lastSeen: location.updatedAt
         };
 
-        // ✅ 3. Emit only to group
-        io.to(groupId).emit("receive_location", payload);
+        // ✅ Send to everyone EXCEPT sender
+        socket.to(groupId).emit("receive_location", payload);
 
       } catch (err) {
         console.error("Socket location error:", err);
@@ -79,6 +53,7 @@ const setupLocationSocket = (io) => {
     socket.on("disconnect", () => {
       console.log("User disconnected:", userId);
 
+      // Send disconnect only to groups the user was part of
       socket.broadcast.emit("user_disconnected", {
         userId,
         lastSeen: new Date()
