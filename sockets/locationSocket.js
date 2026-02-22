@@ -58,11 +58,11 @@ const setupLocationSocket = (io) => {
         );
 
         // ✅ 2. Get user details
-        const user = await User.findById(userId).select("name");
+        const user = await User.findById(userId).select("firstName");
 
         const payload = {
           userId,
-          name: user?.name || "Unknown",
+          name: user?.firstName || "Unknown",
           latitude,
           longitude,
           lastSeen: location.updatedAt
