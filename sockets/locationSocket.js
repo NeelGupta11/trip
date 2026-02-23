@@ -17,8 +17,21 @@ const setupLocationSocket = (io) => {
 
     socket.join(userId);
 
-    socket.on("join_group", (groupId) => {
+    socket.on("join_group", async (groupId) => {
       socket.join(groupId);
+
+      const members = await UserLocation.find({ groupId })
+        .populate("user", "firstName");
+
+      members.forEach(member => {
+        socket.emit("receive_location", {
+          userId: member.user._id,
+          name: member.user.firstName,
+          latitude: member.latitude,
+          longitude: member.longitude,
+          lastSeen: member.updatedAt
+        });
+      });
     });
 
     socket.on("send_location", async (data) => {
