@@ -19,8 +19,8 @@ const setupLocationSocket = (io) => {
 
     socket.on("join_group", async (groupId) => {
       socket.join(groupId);
-
-      const members = await UserLocation.find({ groupId })
+      try{
+      const members = await UserLocation.find()
         .populate("user", "firstName");
 
       members.forEach(member => {
@@ -32,6 +32,9 @@ const setupLocationSocket = (io) => {
           lastSeen: member.updatedAt
         });
       });
+    } catch(err){
+      console.log("Error sending group locations: ",err);
+    }
     });
 
     socket.on("send_location", async (data) => {
