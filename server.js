@@ -15,6 +15,7 @@ const locationRoutes=require("./routes/locationRoutes")
 const getgrouplocation=require("./routes/getgrouplocation")
 const getpersonlocation=require("./routes/getpersonlocation")
 const LoginPost=require("./routes/LoginPost")
+const userRoutes = require("./routes/get_userdetail");
 const getgroups=require("./routes/getgroups")
 const { atlasConn } = require('./config/db');
 const setupLocationSocket = require("./sockets/locationSocket");
@@ -46,6 +47,7 @@ app.use(getgrouplocation)
 app.use(getpersonlocation)
 app.use(LoginPost)
 app.use(getgroups)
+app.use("/api", userRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: "API Running Successfully 🚀" });
