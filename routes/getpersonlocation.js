@@ -5,7 +5,7 @@ const UserLocation = require("../models/UserLocationModels");
 const router = express.Router();
 
 // GET user location by userId
-router.get("/user/:userId", async (req, res) => {
+router.get("/userlocation/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
