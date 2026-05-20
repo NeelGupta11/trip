@@ -15,8 +15,12 @@ const locationRoutes=require("./routes/locationRoutes")
 const getgrouplocation=require("./routes/getgrouplocation")
 const getpersonlocation=require("./routes/getpersonlocation")
 const LoginPost=require("./routes/LoginPost")
+const groupMembersRoute = require("./routes/groupMembers");
 const get_userRoutes = require("./routes/get_userdetail");
 const getgroups=require("./routes/getgroups")
+const mapdata=require("./routes/Mapdata")
+const expenseRoutes = require("./routes/Expenseroutes");
+const expense = require("./routes/Expense");
 const { atlasConn } = require('./config/db');
 const setupLocationSocket = require("./sockets/locationSocket");
 
@@ -48,7 +52,10 @@ app.use(getpersonlocation)
 app.use(LoginPost)
 app.use(getgroups)
 app.use(get_userRoutes);
-
+app.use(mapdata);
+app.use("/expense",expenseRoutes);
+app.use("/expense",expense);
+app.use("/group", groupMembersRoute);
 app.get('/', (req, res) => {
   res.json({ message: "API Running Successfully 🚀" });
 });
@@ -58,9 +65,6 @@ setupLocationSocket(io);
 
 const PORT = process.env.PORT || 3000;
 
-// httpServer.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

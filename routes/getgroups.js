@@ -9,7 +9,6 @@ router.get("/user/:userId/groups", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    console.log("hello")
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
@@ -29,7 +28,7 @@ router.get("/user/:userId/groups", async (req, res) => {
         groups: []
       });
     }
-
+    console.log(groups)
     return res.status(200).json({
       success: true,
       message: "Groups fetched successfully",

@@ -1,7 +1,7 @@
 const UserLocation = require("../models/UserLocationModels");
 const User = require("../models/UserSignUpmodel");
 const mongoose = require("mongoose");
-
+const Group =require("../models/GroupModel")
 const setupLocationSocket = (io) => {
 
   io.on("connection", async (socket) => {
@@ -20,9 +20,14 @@ const setupLocationSocket = (io) => {
     socket.on("join_group", async (groupId) => {
       socket.join(groupId);
       try{
-      const members = await UserLocation.find()
-        .populate("user", "firstName");
 
+      const group = await Group.findById(groupId).select("members");
+      const members = await UserLocation.find({
+        user: { $in: group.members }
+      }).populate("user", "firstName");
+      // const members = await UserLocation.find()
+      //   .populate("user", "firstName");
+      console.log(members)
       members.forEach(member => {
         socket.emit("receive_location", {
           userId: member.user._id,
